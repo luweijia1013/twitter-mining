@@ -273,8 +273,8 @@ def parseTweet(line):
 
 if __name__ == '__main__':
     api = TwitterAPI()
-    searchText = 'huawei'
-    tweets = api.collector(searchText, 20000)
+    searchText = 'warriors'
+    tweets = api.collector(searchText, 50000)
     TIMEFORMAT = '%Y%m%d_%H%M'
     theTime = datetime.datetime.now().strftime(TIMEFORMAT)
     if(len(tweets)>0):

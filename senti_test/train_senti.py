@@ -151,7 +151,7 @@ if __name__=="__main__":
 
     # upsampling('a'+str(num),'upa'+str(num))
     # upsampling('b','upb')
-    upsampling('datatest','upc')
+    upsampling('datatest','data/upc')
 
 
     ##TRAINING
@@ -159,13 +159,13 @@ if __name__=="__main__":
     #                 "epoch": 20,
     #                 "wordNgrams": 2,
     #                 "dim": 20}
-    model = train_supervised(input = 'upc')
-    model_acc_training_set = model.test('upc')
-    model_acc_validation_set = model.test('upa')
+    model = train_supervised(input = 'data/upc')
+    model_acc_training_set = model.test('data/upc')
+    model_acc_validation_set = model.test('data/upa')
 
     # DISPLAY ACCURACY OF TRAINED MODEL
     text_line = "accuracy:" + str(model_acc_training_set[1]) + ", validation:" + str(
         model_acc_validation_set[1]) + '\n'
     print(text_line)
-    model.save_model('tmodel_25000_self')
+    model.save_model('model/tmodel_85000_self')
 

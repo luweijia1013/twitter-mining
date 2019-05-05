@@ -18,7 +18,7 @@ def parseTweets(input):
     return result
 
 if __name__=="__main__":
-    classifier = load_model("tmodel2")
+    classifier = load_model("model/tmodel2")
     simpletexts = ['nice', 'happy', 'fine', 'great', 'ok', 'sorry', 'sad', 'rip', 'Saturday']
     texts = ['Ugghhh... Not happy at all! sorry', 'I am so sad', 'Happyyyyyyy', 'OH yeah! lets rock.']
     test = ['liverpool is awesome','liverpool is so great','liverpool is so good','liverpool is ok','liverpool is better than chelsea',
