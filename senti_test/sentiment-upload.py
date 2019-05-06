@@ -18,7 +18,7 @@ def parseTweets(input):
     return result
 
 def prediction(texts):
-    model_name = "tmodel2"
+    model_name = "model/tmodel2"
     classifier = load_model(model_name)
     pred = classifier.predict(parseTweets(texts),3)
     probs = pred[len(pred)-1]
@@ -27,6 +27,11 @@ def prediction(texts):
     for i in range(len(labels)):
         label = labels[i]
         prob = probs[i]
+        prob_sum = 0
+        for j in prob:
+            prob_sum = prob_sum + j;
+        for j in range(len(prob)):
+            prob[j] = prob[j] / prob_sum
         result = (1 * prob[label.index('__label__NEGATIVE')] + 2 * prob[label.index('__label__NEUTRAL')] + 3 * prob[label.index('__label__POSITIVE')])
         result = result - 2
         results.append(result)

@@ -9,7 +9,7 @@ import numpy as np
 def parseTweets(input):
     result = []
     for line in input:
-        line.replace('RT','')
+        line = line.replace('RT','')
         # reg = re.compile(r'\d')
         # line = reg.sub("",line, 19)
         line = ' '.join(re.sub("(@[A-Za-z0-9]+)|(#[A-Za-z0-9]+)", " ", line).split())
@@ -26,17 +26,17 @@ if __name__=="__main__":
             'liverpool is worse than chelsea','liverpool is terrible','liverpool is the worst']
 
     ##get dataset by prediction of the model
-    with open('datatest', 'a') as wf:
-        with open('parsed', 'r') as rf:
-            for line in rf.readlines():
-                line_list = []
-                line_list.append(line)
-                linep = parseTweets(line_list)
-                pred = classifier.predict(linep)
-                wf.write(pred[0][0][0])
-                wf.write(' ')
-                wf.write(linep[0])
-                wf.write('\n')
+    # with open('datatest', 'a') as wf:
+    #     with open('parsed', 'r') as rf:
+    #         for line in rf.readlines():
+    #             line_list = []
+    #             line_list.append(line)
+    #             linep = parseTweets(line_list)
+    #             pred = classifier.predict(linep)
+    #             wf.write(pred[0][0][0])
+    #             wf.write(' ')
+    #             wf.write(linep[0])
+    #             wf.write('\n')
 
 
     # pred = classifier.predict(parseTweets(test),3)
@@ -51,3 +51,11 @@ if __name__=="__main__":
     #     results.append(result)
     #
     # print(results)
+
+    ##TEST MODEL
+    model_acc_test_set = classifier.test('manully_labelled_testset')
+
+    # DISPLAY ACCURACY OF TRAINED MODEL
+    text_line = "accuracy:"  + str(
+        model_acc_test_set[1]) + '\n'
+    print(text_line)
