@@ -22,14 +22,14 @@ class TwitterAPI():
         :param access_token_secret: Used to authorize requests to the Twitter API
         """
 
-        self.consumer_key = 'ZqNtCbyxoWMAkqvEUVeuVbJzM'
-        self.consumer_secret = '25NKzjVS9AT5KKqMBG8XZqiBYbUvb5aVOkuTihFJphwpscDdGZ'
-        self.access_token_key = '1091008892866318337-RvNvRsrMR4sADqM3b2Rbe4Z63Q8ruh'
-        self.access_token_secret = 'ZndXLIfY1t4Jq7HH9fTVWIqZCmjl0dazykRuEtQhh7JCI'
-        # self.consumer_key = '0PmaM0QgDLKCUnzQxFlBPD5Mx'
-        # self.consumer_secret = 'NFtjDYpYJgnmUQverFcQJMFt6x9fduJPG9MkjybfAsteaKq1ng'
-        # self.access_token_key = '449060412-KGZ1sg1cqPCsyWrEZPYkiLkgX19uF4R3ruvzXdnD'
-        # self.access_token_secret = 'KuiSKD82mpyPWCYZk3kUEv2eIcUOqwC7xujdvXRvaILLC'
+        # self.consumer_key = 'ZqNtCbyxoWMAkqvEUVeuVbJzM'
+        # self.consumer_secret = '25NKzjVS9AT5KKqMBG8XZqiBYbUvb5aVOkuTihFJphwpscDdGZ'
+        # self.access_token_key = '1091008892866318337-RvNvRsrMR4sADqM3b2Rbe4Z63Q8ruh'
+        # self.access_token_secret = 'ZndXLIfY1t4Jq7HH9fTVWIqZCmjl0dazykRuEtQhh7JCI'
+        self.consumer_key = '0PmaM0QgDLKCUnzQxFlBPD5Mx'
+        self.consumer_secret = 'NFtjDYpYJgnmUQverFcQJMFt6x9fduJPG9MkjybfAsteaKq1ng'
+        self.access_token_key = '449060412-KGZ1sg1cqPCsyWrEZPYkiLkgX19uF4R3ruvzXdnD'
+        self.access_token_secret = 'KuiSKD82mpyPWCYZk3kUEv2eIcUOqwC7xujdvXRvaILLC'
         self.dir_path = os.path.realpath(os.path.dirname(__file__))
         try:
             print('Starting Twitter scraper')
@@ -59,14 +59,14 @@ class TwitterAPI():
                     new_tweets = []
                     if max_id <= 0:
                         if not since_id:
-                            new_tweets = self.twitter.search(q=text, lang="en", count=100, tweet_mode='extended')
+                            new_tweets = self.twitter.search(q=text, geocode="51.5,-0.127474,10mi", lang="en", count=100, tweet_mode='extended')
                         else:
-                            new_tweets = self.twitter.search(q=text, lang="en", count=100, max_id=str(max_id-1), tweet_mode='extended')
+                            new_tweets = self.twitter.search(q=text, geocode="51.5,-0.127474,10mi", lang="en", count=100, max_id=str(max_id-1), tweet_mode='extended')
                     else:
                         if not since_id:
-                            new_tweets = self.twitter.search(q=text, lang="en", count=100, max_id=str(max_id-1), tweet_mode='extended')
+                            new_tweets = self.twitter.search(q=text, geocode="51.5,-0.127474,10mi", lang="en", count=100, max_id=str(max_id-1), tweet_mode='extended')
                         else:
-                            new_tweets = self.twitter.search(q=text, lang="en", count=100, max_id=str(max_id-1), since_id=since_id,tweet_mode='extended')
+                            new_tweets = self.twitter.search(q=text, geocode="51.5,-0.127474,10mi", lang="en", count=100, max_id=str(max_id-1), since_id=since_id,tweet_mode='extended')
                     if len(new_tweets['statuses']) == 0:
                         print('No new tweets. Collected ' + str(len(total_tweets)) + ' tweets.')
                         return total_tweets
@@ -245,6 +245,7 @@ class TwitterAPI():
             if tweet['id'] not in seen_tweets:
                 seen_tweets.append(tweet['id'])
                 user = tweet['user']
+                place = tweet['place']
                 user = dict(user_id=user['id'], name=user['name'])
                             # screen_name=user['screen_name'], 
                             #followers_count=user['followers_count'],
@@ -252,7 +253,7 @@ class TwitterAPI():
                             #following=user['friends_count'])
                 if 'full_text' in tweet.keys():
                     tweet_dict = dict(tweet_id=tweet['id'], tweet=tweet['full_text'],
-                                      date=tweet['created_at'], user=user)#, retweet_count=tweet['retweet_count'])
+                                      date=tweet['created_at'], user=user, place = place)#, retweet_count=tweet['retweet_count'])
                 else:
                     tweet_dict = dict(tweet_id=tweet['id'], tweet=tweet['text'],
                                       date=tweet['created_at'], user=user)#, retweet_count=tweet['retweet_count'])
@@ -260,8 +261,8 @@ class TwitterAPI():
                 # if tweet_dict['retweet_count'] > 0:
                 #     retweet_users = self.get_retweet_users(tweet_dict)
                 #     tweet_dict['retweet_users'] = retweet_users
-                if len(tweet_dict['tweet']) > 20:
-                    filtered_tweets.append(tweet_dict['tweet'])
+                if len(tweet_dict['tweet']) > 10: #and tweet_dict['place']:# and tweet_dict['place']['country_code']=='GB':
+                    filtered_tweets.append(tweet_dict['date'] + ' ***** ' + tweet_dict['tweet']) #tweet_dict['place']['name'] + '  ****** ' +
         return filtered_tweets
 
 def parseTweet(line):
@@ -273,15 +274,20 @@ def parseTweet(line):
 
 if __name__ == '__main__':
     api = TwitterAPI()
-    searchText = 'warriors'
-    tweets = api.collector(searchText, 50000)
+    searchText = 'air quality'
+    tweets = api.collector(searchText, 10000)
     TIMEFORMAT = '%Y%m%d_%H%M'
     theTime = datetime.datetime.now().strftime(TIMEFORMAT)
+    tweets_set = set()
+    for tweet in tweets:
+        tweet = ' '.join(tweet.split())
+        tweets_set.add(tweet)
     if(len(tweets)>0):
-        with open('data/sample_' + searchText + '_' + theTime , 'w') as f:
+        with open('data/THESIS_' + searchText + '_' + theTime , 'w') as f:
             # json.dump(tweets, f)
-            for tweet in tweets:
-                tweet = ' '.join(tweet.split())
-                tweet = parseTweet(tweet)
+            for tweet in tweets_set:
+                # tweet = tweet.encode("UTF-8")
+                # tweet = parseTweet(tweet)
+                # print(tweet)
                 f.write(tweet)
                 f.write('\n')
