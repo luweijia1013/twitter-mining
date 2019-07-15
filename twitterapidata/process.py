@@ -14,23 +14,34 @@ def normalization(lists):
         res.append(normal_values)
     return res
 
-def readSensorData(filename, startrow, rowranges):
+def readSensorData(filename, startrows, rowranges, multiplestations):
+    if not multiplestations and len(startrows) != 1:
+        print('ERROR OF MULTISTATIONS')
+        return []
     path = 'data/sensordata/'+ filename
     sheet = pd.read_csv(path)
     rows = sheet.values.tolist()
     res = []
+    if multiplestations:
+        startrows = [0]
+        tempsite = rows[0][0]
+        for i,row in enumerate(rows):
+            if row[0] != tempsite:
+                tempsite = row[0]
+                startrows.append(i)
     for rowrange in rowranges:
         for row in rowrange:
-            row += startrow
+            s_values = [rows[row+start][3] for start in startrows if rows[row+start][3] == rows[row+start][3]]
+            print(s_values)# !!!!! which can be used to illustrate the importance of multistaion on missing data
             # easy process for missing data
-            if rows[row][3] != rows[row][3]:
-                # nan
-                if row-1-startrow in rowrange and row+1-startrow in rowrange and rows[row-1][3]==rows[row-1][3] and rows[row+1][3]==rows[row+1][3]:
-                    res.append((rows[row-1][3] + rows[row+1][3]) / 2)
-                else:
-                    res.append(-1)
+            if not s_values:
+                # nan for all stations
+                res.append(-1)
             else:
-                res.append(rows[row][3])
+                res.append(sum(s_values)/len(s_values))
+    for i in range(len(res)):
+        if res[i] == -1 and i in range(1, len(res) - 1) and res[i - 1] != -1 and res[i + 1] != -1:
+            res[i] = (res[i - 1] + res[i + 1]) / 2
     return res
 
 
@@ -89,15 +100,15 @@ if __name__ == '__main__':
     print(nums)
     # Westminster - Marylebone Road FDMS
     # PM10 MY7
-    values_sensors1 = readSensorData('LaqnData_pm10.csv', 43, [range(2,13),range(15,26),range(34,43)])
+    values_sensors1 = readSensorData('LaqnData_pm10.csv', [43], [range(2,13),range(15,26),range(34,43)], False)
     # NO2 WM6
-    values_sensors2 = readSensorData('LaqnData_no2.csv', 0, [range(2,13),range(15,26),range(34,43)])
+    values_sensors2 = readSensorData('LaqnData_no2_westminster.csv', [0], [range(2,13),range(15,26),range(34,43)], True)
     values_sensors = values_sensors2#[(values_sensors1[i] + values_sensors2[i])/2 for i in range(min(len(values_sensors1), len(values_sensors2)))]
-    # values_sensors = [15.2,17.5,12.8,8.5,9.4,6.9,7.7,5.7,6.3,6.8,10,8.7,7.7,7,9,11,13.6,9.3,7.9,8.3,18.7,23.7,15.8]
     # for i in range(max(nums.keys()), min(nums.keys()), -1):
     #     if i not in nums:
     #        del values_sensors[i-min(nums.keys())]
     # values,values_sensors = normalization([values,values_sensors])
+    print(values_sensors)
     time_delay = 0
     values_sensors = values_sensors[time_delay:]
     compareDatesCurve([t[0]+'-2019' for t in nums], values, 'Number of tweets', values_sensors, 'Sensor Value(ug/m3)', 'Correlation of NO2(WM6) value and tweets number')
