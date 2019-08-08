@@ -31,6 +31,7 @@ class StdOutListener(StreamListener):
     def on_data(self, data):
         tweet = json.loads(data, parse_float = decimal.Decimal)
         if tweet['lang'] == 'en':
+            tweet.encode('utf-8')
             # tweets.append(' '.join(tweet['text'].split()))
             print(' '.join(tweet['text'].split()))
             with open('data/apple', 'a') as f:
