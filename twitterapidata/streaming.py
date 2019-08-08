@@ -31,13 +31,17 @@ class StdOutListener(StreamListener):
     def on_data(self, data):
         tweet = json.loads(data, parse_float = decimal.Decimal)
         if tweet['lang'] == 'en':
-            tweets.append(' '.join(tweet['text'].split()))
-        print(len(tweets))
-        STEP = 3
-        if len(tweets) > 0 and len(tweets) % STEP == 0:
-            with open('data/apple','w') as f:
-                for i in range(STEP):
-                    f.write(tweets.pop(0))
+            # tweets.append(' '.join(tweet['text'].split()))
+            print(' '.join(tweet['text'].split()))
+            with open('data/apple', 'a') as f:
+                f.write(' '.join(tweet['text'].split())+'\n')
+
+        # print(len(tweets))
+        # STEP = 3
+        # if len(tweets) > 0 and len(tweets) % STEP == 0:
+        #     with open('data/apple','a') as f:
+        #         for i in range(STEP):
+        #             f.write(tweets.pop(0))
             return True
 
         # tweet变量就是获取到的数据
