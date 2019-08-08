@@ -22,14 +22,22 @@ access_token_secret = 'ZndXLIfY1t4Jq7HH9fTVWIqZCmjl0dazykRuEtQhh7JCI'
 # access_token_secret="4Xbkp8pwuDQ9LArejXfdRnsA70lB9CDOg0MF1It54FNGa"
 result = []
 
+tweets = []
+
 class StdOutListener(StreamListener):
     """ A listener handles tweets that are received from the stream.
     This is a basic listener that just prints received tweets to stdout.
     """
     def on_data(self, data):
         tweet = json.loads(data, parse_float = decimal.Decimal)
-        if tweet['lang'] == 'zh':
-            print(' '.join(tweet['text'].split()))
+        if tweet['lang'] == 'en':
+            tweets.append(' '.join(tweet['text'].split()))
+        print(len(tweets))
+        STEP = 3
+        if len(tweets) > 0 and len(tweets) % STEP == 0:
+            with open('data/apple','w') as f:
+                for i in range(STEP):
+                    f.write(tweets.pop(0))
             return True
 
         # tweet变量就是获取到的数据
@@ -47,6 +55,6 @@ if __name__ == '__main__':
     stream = Stream(auth, l)
     while True:
         try:
-            stream.filter(track=['@apple','@nike','@facebook','@nintendo','@tesco','@starbucks','@lfc','@warriors','@huawei','@bapeofficial','@netflix','@tesla'])
+            stream.filter(track=['@apple'])
         except (ProtocolError, AttributeError):
             continue
