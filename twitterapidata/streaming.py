@@ -29,27 +29,34 @@ class StdOutListener(StreamListener):
     """
 
     tweets = []
+    raw_data = []
     tweets_num = 0
 
     def on_data(self, data):
         tweet = json.loads(data, parse_float = decimal.Decimal)
         #print(tweet['text'])
-        if tweet['lang']:# == 'en':
-            StdOutListener.tweets.append(tweet)
-            #StdOutListener.tweets.append(' '.join(tweet['text'].split()))
-            # print(' '.join(tweet['text'].split()))
-            # with open('data/apple', 'a') as f:
-            #     f.write(' '.join(tweet['text'].split())+'\n')
+        # if tweet['lang']:# == 'en':
+        StdOutListener.tweets.append(tweet['text'])
+        StdOutListener.raw_data.append(data)
+        #StdOutListener.tweets.append(' '.join(tweet['text'].split()))
+        # print(' '.join(tweet['text'].split()))
+        # with open('data/apple', 'a') as f:
+        #     f.write(' '.join(tweet['text'].split())+'\n')
 
-            StdOutListener.tweets_num += 1
-            print(StdOutListener.tweets_num)
-            STEP = 1
-            if len(StdOutListener.tweets) > 0 and len(StdOutListener.tweets) % STEP == 0:
-                with open('data/rateairqualityitest','a') as f:
-                    for i in range(STEP):
-                        json.dump(StdOutListener.tweets.pop(0),f)
-                        #f.write(StdOutListener.tweets.pop(0).encode('utf-8'))
-                        f.write('\n'.encode('utf-8'))
+        StdOutListener.tweets_num += 1
+        print(StdOutListener.tweets_num)
+        STEP = 10
+        if len(StdOutListener.tweets) > 0 and len(StdOutListener.tweets) % STEP == 0:
+            with open('data/active/appletest','a') as f:
+                for i in range(STEP):
+                    json.dump(StdOutListener.tweets.pop(0),f)
+                    #f.write(StdOutListener.tweets.pop(0).encode('utf-8'))
+                    f.write('\n')
+            with open('data/active/appletest_raw','a') as f:
+                for i in range(STEP):
+                    json.dump(StdOutListener.raw_data.pop(0),f)
+                    #f.write(StdOutListener.tweets.pop(0).encode('utf-8'))
+                    f.write('\n')
         return True
 
 
@@ -65,6 +72,6 @@ if __name__ == '__main__':
     stream = Stream(auth, l)
     while True:
         try:
-            stream.filter(track=['#rateairqualitytest'])
+            stream.filter(track=['airquality'])
         except (ProtocolError, AttributeError):
             continue
