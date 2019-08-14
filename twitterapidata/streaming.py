@@ -29,27 +29,29 @@ class StdOutListener(StreamListener):
     """
 
     tweets = []
+    tweets_num = 0
 
     def on_data(self, data):
         tweet = json.loads(data, parse_float = decimal.Decimal)
-        print(tweet['text'])
-        if tweet['lang'] == 'en':
-            tweet['text'].encode('utf-8')
-            StdOutListener.tweets.append(' '.join(tweet['text'].split()))
+        #print(tweet['text'])
+        if tweet['lang']:# == 'en':
+            StdOutListener.tweets.append(tweet)
+            #StdOutListener.tweets.append(' '.join(tweet['text'].split()))
             # print(' '.join(tweet['text'].split()))
             # with open('data/apple', 'a') as f:
             #     f.write(' '.join(tweet['text'].split())+'\n')
 
-            # print(len(StdOutListener.tweets))
-            STEP = 30
+            StdOutListener.tweets_num += 1
+            print(StdOutListener.tweets_num)
+            STEP = 1
             if len(StdOutListener.tweets) > 0 and len(StdOutListener.tweets) % STEP == 0:
-                with open('data/apple','a') as f:
+                with open('data/rateairqualityitest','a') as f:
                     for i in range(STEP):
-                        f.write(StdOutListener.tweets.pop(0))
-                        f.write('\n')
+                        json.dump(StdOutListener.tweets.pop(0),f)
+                        #f.write(StdOutListener.tweets.pop(0).encode('utf-8'))
+                        f.write('\n'.encode('utf-8'))
         return True
 
-        # tweet变量就是获取到的数据
 
 
     def on_error(self, status):
@@ -63,6 +65,6 @@ if __name__ == '__main__':
     stream = Stream(auth, l)
     while True:
         try:
-            stream.filter(track=['@apple'])
+            stream.filter(track=['#rateairqualitytest'])
         except (ProtocolError, AttributeError):
             continue
