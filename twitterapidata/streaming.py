@@ -23,40 +23,49 @@ access_token_secret="4Xbkp8pwuDQ9LArejXfdRnsA70lB9CDOg0MF1It54FNGa"
 result = []
 
 
+class TweetKeyInfo():
+
+    tweet_counts = 0
+
+    def __init__(self, tweetid, createat, text, userid, userhandle, geo, coordinates):
+        self.id = tweetid
+        self.created_at = createat
+        self.text = text
+        self.user = {'id':userid, 'screen_name':userhandle}
+        self.geo = geo
+        self.coordinates = coordinates
+        TweetKeyInfo.tweet_counts += 1
+
 class StdOutListener(StreamListener):
     """ A listener handles tweets that are received from the stream.
     This is a basic listener that just prints received tweets to stdout.
     """
 
-    tweets = []
+    tweets_keyinfo = []
     raw_data = []
     tweets_num = 0
 
     def on_data(self, data):
-        tweet = json.loads(data, parse_float = decimal.Decimal)
-        #print(tweet['text'])
-        # if tweet['lang']:# == 'en':
-        StdOutListener.tweets.append(tweet['text'])
+        #data - JsonStr, tweet - python object(dict)
         StdOutListener.raw_data.append(data)
-        #StdOutListener.tweets.append(' '.join(tweet['text'].split()))
-        # print(' '.join(tweet['text'].split()))
-        # with open('data/apple', 'a') as f:
-        #     f.write(' '.join(tweet['text'].split())+'\n')
-
+        tweet_dict = json.loads(data, parse_float = decimal.Decimal)
+        tweet_key = TweetKeyInfo(tweet_dict['id'], tweet_dict['created_at'], tweet_dict['text'], tweet_dict['user']['id'], tweet_dict['user']['screen_name'], tweet_dict['geo'],tweet_dict['coordinates'])
+        StdOutListener.tweets_keyinfo.append(tweet_key)
         StdOutListener.tweets_num += 1
+
+        # if tweet['lang']:# == 'en':
         print(StdOutListener.tweets_num)
-        STEP = 10
-        if len(StdOutListener.tweets) > 0 and len(StdOutListener.tweets) % STEP == 0:
-            with open('data/active/appletest','a') as f:
+        STEP = 1
+        if len(StdOutListener.tweets_keyinfo) > 0 and len(StdOutListener.tweets_keyinfo) % STEP == 0:
+            with open('data/active/aqrate','a') as f:
                 for i in range(STEP):
-                    json.dump(StdOutListener.tweets.pop(0),f)
-                    #f.write(StdOutListener.tweets.pop(0).encode('utf-8'))
+                    tweet_key = StdOutListener.tweets_keyinfo.pop(0)
+                    f.write(json.dumps(tweet_key.__dict__))
                     f.write('\n')
-            with open('data/active/appletest_raw','a') as f:
+            with open('data/active/aqrate_raw','a') as f:
                 for i in range(STEP):
-                    json.dump(StdOutListener.raw_data.pop(0),f)
-                    #f.write(StdOutListener.tweets.pop(0).encode('utf-8'))
-                    f.write('\n')
+                    rawdata_jsonstr = StdOutListener.raw_data.pop(0)
+                    f.write(rawdata_jsonstr)
         return True
 
 
@@ -72,6 +81,6 @@ if __name__ == '__main__':
     stream = Stream(auth, l)
     while True:
         try:
-            stream.filter(track=['airquality'])
+            stream.filter(track=['tesla'])
         except (ProtocolError, AttributeError):
             continue
