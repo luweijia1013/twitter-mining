@@ -27,14 +27,16 @@ class TweetKeyInfo():
 
     tweet_counts = 0
 
-    def __init__(self, tweetid, createat, text, userid, userhandle, geo, coordinates):
+    def __init__(self, tweetid, createat, text, userid, userhandle, place=None):
         self.id = tweetid
         self.created_at = createat
         self.text = text
         self.user = {'id':userid, 'screen_name':userhandle}
-        self.geo = geo
-        self.coordinates = coordinates
+        self.place = place
         TweetKeyInfo.tweet_counts += 1
+    #
+    # def __init__(self,d):
+    #     self.__dict__ = d
 
 class StdOutListener(StreamListener):
     """ A listener handles tweets that are received from the stream.
@@ -49,7 +51,7 @@ class StdOutListener(StreamListener):
         #data - JsonStr, tweet - python object(dict)
         StdOutListener.raw_data.append(data)
         tweet_dict = json.loads(data, parse_float = decimal.Decimal)
-        tweet_key = TweetKeyInfo(tweet_dict['id'], tweet_dict['created_at'], tweet_dict['text'], tweet_dict['user']['id'], tweet_dict['user']['screen_name'], tweet_dict['geo'],tweet_dict['coordinates'])
+        tweet_key = TweetKeyInfo(tweet_dict['id'], tweet_dict['created_at'], tweet_dict['text'], tweet_dict['user']['id'], tweet_dict['user']['screen_name'], tweet_dict['place'])
         StdOutListener.tweets_keyinfo.append(tweet_key)
         StdOutListener.tweets_num += 1
 
