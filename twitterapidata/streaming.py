@@ -50,7 +50,7 @@ class StdOutListener(StreamListener):
     def on_data(self, data):
         #data - JsonStr, tweet - python object(dict)
         StdOutListener.raw_data.append(data)
-        tweet_dict = json.loads(data, parse_float = decimal.Decimal)
+        tweet_dict = json.loads(data)#, parse_float = decimal.Decimal)
         tweet_key = TweetKeyInfo(tweet_dict['id'], tweet_dict['created_at'], tweet_dict['text'], tweet_dict['user']['id'], tweet_dict['user']['screen_name'], tweet_dict['place'])
         StdOutListener.tweets_keyinfo.append(tweet_key)
         StdOutListener.tweets_num += 1
@@ -62,6 +62,8 @@ class StdOutListener(StreamListener):
             with open('data/active/aqrate','a') as f:
                 for i in range(STEP):
                     tweet_key = StdOutListener.tweets_keyinfo.pop(0)
+                    if tweet_key.place:
+                        print('!!!')
                     f.write(json.dumps(tweet_key.__dict__))
                     f.write('\n')
             with open('data/active/aqrate_raw','a') as f:
